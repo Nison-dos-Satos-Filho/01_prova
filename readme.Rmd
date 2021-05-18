@@ -1,0 +1,377 @@
+---
+title: "01_avaliação"
+author: "Nilson dos Santos Filho </br>"
+date: "08/05/2021"
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+---
+I Sobre o dataset “peixes_rio_madeira.csv”</br>
+**Questão 01**
+
+**a**
+```{r}
+dados_prm <- read_csv("dados/brutos/peixes_rio_madeira.csv")
+
+dados_prm %>% View()
+```
+
+```{r}
+dados_prm %>% 
+  glimpse()
+```
+
+
+```{r}
+dados_prm %>% 
+  group_by(ordem) %>% 
+  summarise(n = n()) %>% 
+  arrange(n)
+
+```
+
+**b**</br>A ordem de peixe mais identificada foi o Characiformes e foram feitas 12 observações. 
+
+**c**</br> Não foram identificados 17 peixes.
+```{r}
+dados_prm %>% 
+  distinct(ordem)
+```
+
+```{r}
+dados_prm %>% 
+  filter(ordem == "Não identificado")
+```
+
+
+
+**Questão 2**
+
+```{r}
+dados_prm %>% 
+  distinct(bacia)
+```
+
+```{r}
+dados_prm %>% 
+select(ordem, peso_g)
+```
+
+```{r}
+dados_prm %>% 
+  summarise(
+    media_peso = mean(peso_g)
+  )
+```
+
+```{r}
+dados_prm %>% 
+  group_by(ordem) %>% 
+  drop_na() %>% 
+  summarise(
+    media_peso = mean(peso_g)
+  )
+```
+
+```{r}
+dados_prm %>% 
+  group_by(ordem) %>% 
+  drop_na() %>% 
+  summarise(
+    Desvio_p = sd(peso_g)
+  )
+```
+
+
+**a**</br>Pelos dados calculados acima: A média de variabilidade mais adequada é Coeficiente de Variação.
+
+**b**</br>Pelos dados calculados abaixo: A ordem de peixes que tem distribuição de peso mais homogênia é Acanthuriformes.
+
+```{r}
+dados_prm %>% 
+  group_by(ordem) %>% 
+  drop_na() %>% 
+  summarise(
+    cv = (sd(peso_g)/mean(peso_g)) * 100
+  )
+```
+
+
+**Questão 3**
+
+```{r}
+dados_prm %>% 
+  distinct(sexo)
+```
+
+
+```{r}
+dados_prm %>% 
+  mutate(
+   sexo_recode = recode(
+    sexo,
+    "Fêmea" = "Fêmea",
+    "Macho" = "Macho",
+    "fêmea" = "Fêmea",
+    "Não coletado" = "Não coletado"
+   ) 
+  ) 
+```
+
+```{r}
+dados_prm %>% 
+  mutate(
+   sexo_recode = recode(
+    sexo,
+    "Fêmea" = "Fêmea",
+    "Macho" = "Macho",
+    "fêmea" = "Fêmea",
+    "Não coletado" = "Não coletado"
+   ) 
+  ) %>% 
+  group_by(sexo_recode) %>% 
+  summarise(
+    n = n())
+```
+
+**a**</br> Pelo dado abaixo a diferença é de 24.22% 
+```{r}
+(28331 - 21469)
+(6862/28331) * 100
+```
+
+
+**b**</br>Pelos dados calculados abaixo: O sexo de peixe que tem maior peso é o da Fêmea.
+
+```{r}
+dados_prm %>% 
+  mutate(
+   sexo_recode = recode(
+    sexo,
+    "Fêmea" = "Fêmea",
+    "Macho" = "Macho",
+    "fêmea" = "Fêmea",
+    "Não coletado" = "Não coletado"
+   ) 
+  ) %>% 
+  select(peso_g, sexo_recode) %>% 
+  group_by(sexo_recode) %>% 
+  drop_na() %>% 
+  summarise(
+    n = sum(peso_g))
+```
+
+
+**Questão 4**</br>Pelos dados calculados abaixo: Os Machos são 8552.
+
+```{r}
+dados_prm %>% 
+  distinct(habito_alimentar)
+```
+
+```{r}
+dados_prm %>% 
+  mutate(
+   sexo_recode = recode(
+    sexo,
+    "Fêmea" = "Fêmea",
+    "Macho" = "Macho",
+    "fêmea" = "Fêmea",
+    "Não coletado" = "Não coletado"
+   ) 
+  ) %>% 
+  filter(habito_alimentar == "Carnívoro") %>% 
+  group_by(sexo_recode) %>% 
+  summarise(
+    n = n())
+```
+
+
+II Sobre o dataset “contracheque.csv”</br>
+
+**Questão 5**</br>Pelos dados calculados abaixo:O maior redimento líquido é 7267672.
+
+
+```{r}
+dados_ctc <- read_csv("dados/brutos/contracheque.csv")
+
+dados_ctc %>% view() 
+```
+
+```{r}
+dados_ctc %>% 
+  group_by(rendimento_liquido) %>% 
+  summarise(n = n()) %>% 
+    arrange(desc(rendimento_liquido))
+```
+
+
+**Questão 6**</br>Pelos dados calculados abaixo:37334 magistrados receberam acima do valor 39293.32.
+```{r}
+dados_ctc %>% 
+  distinct(cargo) %>% view()
+```
+
+```{r}
+dados_ctc %>% 
+  filter(rendimento_liquido > 39293.32) %>% 
+  count()
+```
+
+**a**</br>Pelos dados calculados abaixo:1136 magistrados receberam acima do valor 100000.
+
+```{r}
+dados_ctc %>% 
+  filter(rendimento_liquido > 100000) %>% 
+  count()
+```
+
+**b**</br>Pelos dados calculados abaixo: O Tribunal Regional do Trabalho da 7ª Região (CE) é que possui maior variabilidade. 
+
+```{r}
+dados_ctc %>% 
+  distinct(tribunal)
+```
+
+```{r}
+dados_ctc %>% 
+  summarise(
+    media_rendimento = mean(rendimento_liquido)
+  )
+```
+
+```{r}
+dados_ctc %>% 
+  group_by(tribunal) %>% 
+  select(rendimento_liquido) %>% 
+  drop_na() %>% 
+  summarise(
+    media_rendimento = mean(rendimento_liquido)
+  )
+```
+
+```{r}
+dados_ctc %>% 
+  group_by(tribunal) %>% 
+  select(rendimento_liquido) %>% 
+  drop_na() %>% 
+  summarise(
+    dp_rendimento = sd(rendimento_liquido), dp_rendimento = n()) %>% 
+  arrange(desc(dp_rendimento))
+  
+```
+
+```{r}
+dados_ctc %>% 
+  group_by(tribunal) %>% 
+  select(rendimento_liquido) %>% 
+  drop_na() %>% 
+  summarise(
+    cv = (sd(rendimento_liquido)/mean(rendimento_liquido)) * 100)  
+
+```
+
+```{r}
+dados_ctc %>% 
+  group_by(tribunal) %>% 
+  select(rendimento_liquido) %>% 
+  drop_na() %>% 
+  summarise(
+    cv_rendimento = (sd(rendimento_liquido)/mean(rendimento_liquido)) * 100) %>% 
+  arrange(desc(cv_rendimento)) %>% view()
+```
+
+
+**Questão 7**
+
+```{r}
+dados_cp <- read_csv("dados/brutos/cursos-prouni.csv")
+
+dados_cp %>% view()
+
+```
+
+
+```{r}
+dados_cp %>% 
+  select(nome)
+```
+
+```{r}
+dados_cp %>% 
+  distinct(nome)
+```
+
+**a**</br>Atravez da observação do gráfico a resposta é integral
+
+**b**</br> Pelos dados calculados abaixo: encontramos a média e mediana do turno integral.
+
+```{r}
+dados_cp %>% 
+  group_by(turno) %>% 
+  select(nota_integral_ampla) %>% 
+  drop_na() %>% 
+  summarise(
+    media_nota = mean(nota_integral_ampla)
+  )
+```
+
+```{r}
+dados_cp %>% 
+  group_by(turno) %>% 
+  select(nota_integral_ampla) %>% 
+  drop_na() %>% 
+  summarise(
+    mediana_nota = median(nota_integral_ampla)
+  )
+```
+
+**c**</br> Pelos dados calculados abaixo: Dentre os cinco turnos, o que possui menor homegeneidade na nota integral ampla é Curso a Distância, porque apresenta a maior porcentagem.
+
+```{r}
+dados_cp %>% 
+  group_by(turno) %>%
+  select(nota_integral_ampla) %>% 
+  drop_na() %>% 
+  summarise(
+    Desvio_p = sd(nota_integral_ampla))
+```
+
+```{r}
+dados_cp %>% 
+  group_by(turno) %>%
+  select(nota_integral_ampla) %>% 
+  drop_na() %>% 
+  summarise(
+    cv = (sd(nota_integral_ampla)/mean(nota_integral_ampla) * 100))
+```
+
+**Questão 8**</br>Pelos dados calculados abaixo:O Estado da Bahia ocupa a 5° posição em ordem decrescente. 
+
+```{r}
+dados_cp %>% 
+  group_by(uf_busca) %>%
+  summarise(
+    n = n()
+  )%>% 
+  arrange(desc (n)) %>% view()
+```
+
+**Questão 9**</br>Pelo dado calculado abaixo: Foram identificado distintamente 296 cursos na variável nome.
+
+```{r}
+dados_cp %>% 
+  distinct(nome) %>% view()
+```
+
+**Questão 10**</br> Observando os gráfico, consigo descreve que o gráfico do curso de medicina tem uma destribuição simétrica, o que indica que a média e a mediana converge.Quanto ao gráfico do curso de direito, apresenta uma distribuição assimétrica o que indica que a média tem desvantagem em relação a mediana, assim para este tipo de gráfico a melhor tendência e o desvio padrão.
+
+
+
